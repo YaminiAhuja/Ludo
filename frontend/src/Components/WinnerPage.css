@@ -1,0 +1,79 @@
+
+.winner-page-container {
+  text-align: center;
+  padding: 50px 20px;
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.winner-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  max-width: 400px;
+  width: 100%;
+  animation: popIn 0.5s ease-in-out;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.winner-content h1 {
+  font-size: 2.5rem;
+  color: #2b2d42;
+  margin-bottom: 10px;
+}
+
+.winner-content h2 {
+  font-size: 1.5rem;
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.winner-list {
+  font-size: 1.25rem;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.winner-name {
+  margin: 8px 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.winner-name span {
+  font-size: 1.2rem;
+}
+
+.home-button {
+  margin-top: 30px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+  background-color: #023e8a;
+}

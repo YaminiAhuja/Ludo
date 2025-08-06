@@ -1,0 +1,56 @@
+.user-card {
+  background-color: #f1f1f1;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+  position: relative;
+}
+
+.user-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.user-card.glow {
+  box-shadow: 0 0 15px 5px gold;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 15px 5px gold; }
+  50% { box-shadow: 0 0 25px 10px orange; }
+  100% { box-shadow: 0 0 15px 5px gold; }
+}
+
+.user-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.user-color {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.quit-button {
+  margin-top: 1rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background-color: crimson;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.quit-button:hover {
+  background-color: darkred;
+}
