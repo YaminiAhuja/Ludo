@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './FrontPage.css'
 import { useEffect } from 'react';
-
+import click from '../assets/mixkit-fast-double-click-on-mouse-275.wav'
+import { useSound } from './useSound.jsx';
 const FrontPage = (props) => {
   const [showButton, setShowButton] = useState(false);
   const [message, setMessage] = useState('');
@@ -15,10 +16,12 @@ const FrontPage = (props) => {
   const [buttonName,setName] = useState("Join");
   const [option,setOption] = useState(0);
 
+  const [clickSound,pauseClickSound]= useSound(click); 
   
   
   const handleCreateRoom = () => {
     setAction('create');
+    clickSound();
     if (!props.socket.current?.connected)
       props.socket.current = io(import.meta.env.VITE_SERVER_URL);
 
@@ -46,6 +49,7 @@ const FrontPage = (props) => {
 
   const handleJoinRoom = () => {
     setName("Joining");
+    clickSound();
     if (!roomCode.trim()) {
       setError('Enter valid room code');
       return;
@@ -75,6 +79,7 @@ const FrontPage = (props) => {
   };
 
   const handleJoinRandom = () => {
+    clickSound();
     if (!props.socket.current?.connected)
       props.socket.current = io(import.meta.env.VITE_SERVER_URL);
 
@@ -101,6 +106,7 @@ const FrontPage = (props) => {
   };
 
   const handleUsername = () => {
+    clickSound();
     if (props.username.trim() === '') {
       setMessage('Enter username first');
       return;
@@ -172,7 +178,7 @@ const FrontPage = (props) => {
   
             className="secondary-button"
             disabled = {option!=0 && option!=1?true :false}
-            onClick={() => setAction('join')}
+            onClick={() => {clickSound();setAction('join')}}
           >
             Join Private Room
           </button>

@@ -1,10 +1,14 @@
 import React from 'react';
 import './UserDetail.css';
+import click from '../assets/mixkit-fast-double-click-on-mouse-275.wav'
+import { useSound } from './useSound.jsx';
 import { useNavigate } from 'react-router-dom';
 const UserDetail = (props) => {
-
+  const [clickSound,pauseClickSound]= useSound(click); 
   const navigate = useNavigate()
   function handlequit(e){
+    props.setRoom(false);
+    clickSound();
     props.socket.emit("quit-game");
       navigate("/")
   }

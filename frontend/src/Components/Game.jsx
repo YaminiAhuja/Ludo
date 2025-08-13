@@ -6,7 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 import './Game.css';
-import { faL } from '@fortawesome/free-solid-svg-icons';
+import game_start from '../assets/game_start.mp3'
+import pieceAtHome from '../assets/mixkit-magic-sweep-game-trophy-257.wav'
+import pieceMove from '../assets/mixkit-player-jumping-in-a-video-game-2043.wav'
+import killMusic from '../assets/mixkit-video-game-health-recharge-2837.wav'
+import { useSound } from './useSound.jsx';
 const Game = (props) => {
 
   const { width, height } = useWindowSize()
@@ -16,9 +20,12 @@ const Game = (props) => {
   const [playerTurn, setPlayerTurn] = useState("");
   const navigate = useNavigate();
   const [isConfetti,setConfetti] = useState(false);
+  const [gameStart,pauseGameStart] = useSound(game_start);
   const [confettiCol,setConfettiColor] = useState("");
-  console.log(props.userColor);
-  console.log("user player = ",props.currentplayers)
+  const [pieceHome,pausePieceHome] = useSound(pieceAtHome);
+  const [piecemove , pausePiece] = useSound(pieceMove);
+  const [killSound,pauseKillSound] = useSound(killMusic);
+
   useEffect(() => {
     if (!props.socket.current) {
       navigate('/');
@@ -28,11 +35,14 @@ const Game = (props) => {
     const s = props.socket.current;
 
     function handleUpdateLobby(players) {
+      console.log("settting players djfngf")
       props.setCurrentPlayers(players);
     }
 
     function handleGameStart(_msg, pieceObj) {
       console.log("gamee starteddd");
+      gameStart();
+      console.log("startSound() triggered");
       setPieces(pieceObj);
     }
 
@@ -40,9 +50,11 @@ const Game = (props) => {
       setActivePieces(arr);
     }
 
-    function handleSetPiece(pieceObj) {
+    async function handleSetPiece(pieceObj) {
+      piecemove();
       setActivePieces([]);
       setPieces(pieceObj);
+      setTimeout(()=>{pausePiece()},600)
     }
 
     function handleYourTurn() {
@@ -51,7 +63,7 @@ const Game = (props) => {
     }
 
     function handlePlayerTurn(color) {
-      console.log("player turn" , color);
+      console.log("player turn = " , color);
       setPlayerTurn(color);
       // setTurn(false);
     }
@@ -59,6 +71,10 @@ const Game = (props) => {
     function handleYourTurnEnded() {
       console.log("my turn ended?")
       setTurn(false);
+      setActivePieces([]);
+    }
+    function handleKillSound(){
+      killSound();
     }
 
     async function handleGameOver(winners) {
@@ -67,6 +83,11 @@ const Game = (props) => {
       console.log("game overr!!!!11");
       await new Promise(r =>setTimeout(()=>{console.log("game over!!!1");r()},1000));
       navigate('/gameOver');
+      props.setRoom(false);
+    }
+
+    async function handlerPieceHome() {
+      pieceHome();
     }
 
     function winner(message,color,userDetails){
@@ -76,7 +97,7 @@ const Game = (props) => {
       
   setTimeout(() => {
     setConfetti(false);
-  }, 3000);
+  }, 10000);
     
     }
     // register all handlers
@@ -88,8 +109,10 @@ const Game = (props) => {
     s.on("player-turn", handlePlayerTurn);
     s.on("your-turn-ended", handleYourTurnEnded);
     s.on("game-over", handleGameOver);
+    s.on("piece-inside",handlerPieceHome);
     s.on("winner",winner);
-
+    s.on("piece-killed",handleKillSound);
+    
     return () => {
       s.off("update-lobby", handleUpdateLobby);
       s.off("game-start", handleGameStart);
@@ -99,6 +122,9 @@ const Game = (props) => {
       s.off("player-turn", handlePlayerTurn);
       s.off("your-turn-ended", handleYourTurnEnded);
       s.off("game-over", handleGameOver);
+      s.off("piece-inside",handlerPieceHome);
+      s.on("winner",winner);
+      s.off("piece-killed",handleKillSound);
 
     };
   }, [props.socket, navigate, props.setCurrentPlayers, props.setWinnerList]);
@@ -156,6 +182,7 @@ const Game = (props) => {
         color={color}
         socket = {props.socket.current}
         myColor = {props.userColor}
+        setRoom = {props.setRoom}
         isTurn={playerTurn === color}
       />
     ))

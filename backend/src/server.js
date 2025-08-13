@@ -60,6 +60,16 @@ io.on("connection",(socket)=>{
         callback({success : true,roomcode : room.code,color : playerColor,player: room.getPlayerList()});
     });
 
+    socket.on("quit-game",()=>{
+         const room = roomManager.leaveRoom(socket.id);
+        if(room){
+            console.log(room.getPlayerList());
+            io.to(room.code).emit("update-lobby", room.getPlayerList());
+        }
+        console.log(`User disconnected: ${socket.id}`);
+
+    })
+
     socket.on("join-random",(name,maxPlayers=4,callback)=>{
         let room = roomManager.getAvailableRandomRoom(maxPlayers);
         if(room){
@@ -78,7 +88,7 @@ io.on("connection",(socket)=>{
                 room.gameManager = gameManager;
             }
 
-            callback({ roomCode: room.code, players: room.getPlayerList(),color : playerColor, joined: true });
+            callback({ roomCode: room.code, player: room.getPlayerList(),color : playerColor, joined: true });
         }
         else{
             room = roomManager.createRoom(socket,name,maxPlayers,true);
@@ -86,7 +96,7 @@ io.on("connection",(socket)=>{
             const currentPlayer = room.player.find(p => p.socket.id === socket.id);
             const playerColor = currentPlayer?.color
             io.to(room.code).emit("update-lobby",room.getPlayerList());
-            callback({ roomCode: room.code, players: room.getPlayerList(),color : playerColor, joined: true });
+            callback({ roomCode: room.code, player: room.getPlayerList(),color : playerColor, joined: true });
 
         }
     })

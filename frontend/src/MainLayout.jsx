@@ -8,7 +8,6 @@ import {
 import FrontPage  from './Components/FrontPage.jsx';
 import Game       from './Components/Game.jsx';
 import WinnerPage from './Components/WinnerPage.jsx';
-import { faL } from '@fortawesome/free-solid-svg-icons';
 
 export default function MainLayout() {
   const [username,setUsername]       = useState('');

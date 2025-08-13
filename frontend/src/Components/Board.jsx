@@ -1,13 +1,12 @@
 import React from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import './Board.css'
 import { useEffect } from 'react';
 import { useState } from 'react';
 const Board = ({pieces,currentPlayer,ActivePiecesArr,socket}) => {
 const [location,setLocation] = useState([]);
 const [piecesVal,setPiecesVal] = useState([]);
-// console.log(currentPlayer);
 const keys = Object.keys(pieces);
 useEffect(()=>{
 const loc = [];
@@ -41,9 +40,15 @@ const GreenPathDiv = ["r11","r12","r13","r10","gh1","g1","r9","gh2","g2","r8","g
 const greenColorPath = ["gh4","gh3","gh2","g1","gh1","gh5"];
 const home = ["home-1","home-2","home-3","home-4"];
 
+function PiecePathClicked(p){
+    console.log("piece clicked = ",p);
+    socket.emit("piece-selected",p);
+}
+
 function PieceClicked(event){
-    // console.log(event.currentTarget.id);
+    console.log("piece clicked = ",event.currentTarget.id);
     socket.emit("piece-selected",event.currentTarget.id);
+
 }
 
 
@@ -59,7 +64,7 @@ return (
                         if(location.includes(indexVal)){
                         return <span key = {indexVal} id = {indexVal}>
                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-                         icon={faLocationPin} className = {`piece 
+                         icon={faCircle} className = {`piece 
                          ${piecesVal[location.indexOf(indexVal)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? `${piecesVal[location.indexOf(indexVal)].team}-active` : ""}`} 
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? PieceClicked :()=>{}}
                          />
@@ -81,15 +86,17 @@ return (
                    {GreenPathDiv.map((index)=>{
 
                     let piecesInThis =  location.map((loc,i)=>({loc,piece : piecesVal[i]})).filter(({loc})=>(loc ===index));
-
-                    return <div key = {index}  className={`ludobox ${greenColorPath.includes(index) ? "greenLudoBox" : ""} ${index === 'r9' ? 'special' : ''}` } id = {index}>
+                    let activePieces = piecesInThis.filter(({loc,piece})=>(ActiveLocations.includes(piece.id))).map(({loc,piece})=>(piece.id));
+                    // console.log("ActivePieces = ",activePieces);
+                    return <div key = {index}  className={`ludobox ${greenColorPath.includes(index) ? "greenLudoBox" : ""} ${index === 'r9' ? 'special' : ''}` } id = {index}
+                      onClick={(activePieces.length>0 ? ()=>{PiecePathClicked(activePieces[0])}: ()=>{})}
+                    >
                      <div className="piece-container">
                     {
                         piecesInThis.map(({piece},i)=>{
-                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faLocationPin} 
+                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piece.team}-piece ${ActiveLocations.includes(`${piece.id}`)? `${piece.team}-active` : ""}`} 
-                         onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
                          />
                         })
                     }
@@ -101,7 +108,7 @@ return (
                     GreenPathDiv.map((index)=>{
                         if(location.includes(index)){
                             return (<div key = {index} className={`ludobox ${greenColorPath.includes(index) ? "greenLudoBox" : ""} ${index === 'r9' ? 'special' : ''}`} id = {index}>
-                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piecesVal[location.indexOf(index)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? `${piecesVal[location.indexOf(index)].team}-active` : ""}`}
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? PieceClicked :()=>{}}
@@ -122,7 +129,7 @@ return (
                         if(location.includes(indexVal)){
                         return <span key = {indexVal} id = {indexVal}>
                         <FontAwesomeIcon key = {index} id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-                         icon={faLocationPin} className = {`fa-location-pin piece 
+                         icon={faCircle} className = {`fa-location-pin piece 
                         ${piecesVal[location.indexOf(indexVal)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? `${piecesVal[location.indexOf(indexVal)].team}-active` : ""}`}
                         onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? PieceClicked :()=>{}}
                         />
@@ -142,16 +149,21 @@ return (
                  {RedPathDiv.map((index)=>{
 
                     let piecesInThis =  location.map((loc,i)=>({loc,piece : piecesVal[i]})).filter(({loc})=>(loc ===index));
-
-                    return <div key = {index}  className={`ludobox ${redColorPath.includes(index) ? "redLudoBox" : ""} ${index === 'b9' ? 'special' : ''}` } id = {index}>
+                   
+                    let activePieces = piecesInThis.filter(({loc,piece})=>(ActiveLocations.includes(piece.id))).map(({loc,piece})=>(piece.id));
+                    // console.log("ActivePieces = ",activePieces);
+                    
+                    return <div key = {index}  className={`ludobox ${redColorPath.includes(index) ? "redLudoBox" : ""} ${index === 'b9' ? 'special' : ''}` } id = {index}
+                      onClick={(activePieces.length>0 ? ()=>{PiecePathClicked(activePieces[0])}: ()=>{})}
+                    >
                     <div className="piece-container">
 
                     {
                         piecesInThis.map(({piece},i)=>{
-                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faLocationPin} 
+                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piece.team}-piece ${ActiveLocations.includes(`${piece.id}`)? `${piece.team}-active` : ""}`} 
-                         onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
+                        //  onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
                          />
                         })
                     }
@@ -163,7 +175,7 @@ return (
                     RedPathDiv.map((index)=>{
                         if(location.includes(index)){
                             return (<div key = {index} className={`ludobox ${redColorPath.includes(index) ? "redLudoBox" : ""} ${index === 'b9' ? 'special' : ''}`} id = {index}>
-                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piecesVal[location.indexOf(index)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? `${piecesVal[location.indexOf(index)].team}-active` : ""}`}
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? PieceClicked :()=>{}}
@@ -182,16 +194,22 @@ return (
                 {YellowPathDiv.map((index)=>{
 
                     let piecesInThis =  location.map((loc,i)=>({loc,piece : piecesVal[i]})).filter(({loc})=>(loc ===index));
+                    let activePieces = piecesInThis.filter(({loc,piece})=>(ActiveLocations.includes(piece.id))).map(({loc,piece})=>(piece.id));
+                    // console.log("ActivePieces = ",activePieces);
+                    // let activePieces = piecesInThis.map((p)=>{ActiveLocations.includes(`${p.id}`)});
+                    // console.log("ActivePieces = ",activePieces);
 
-                    return <div key = {index}  className={`ludobox ${yellowColorPath.includes(index) ? "yellowLudoBox" : ""} ${index === 'g9' ? 'special' : ''}` } id = {index}>
+                    return <div key = {index}  className={`ludobox ${yellowColorPath.includes(index) ? "yellowLudoBox" : ""} ${index === 'g9' ? 'special' : ''}` } id = {index}
+                      onClick={(activePieces.length>0 ? ()=>{PiecePathClicked(activePieces[0])}: ()=>{})}
+                    >
                                          <div className="piece-container">
 
                     {
                         piecesInThis.map(({piece},i)=>{
-                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faLocationPin} 
+                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piece.team}-piece ${ActiveLocations.includes(`${piece.id}`)? `${piece.team}-active` : ""}`} 
-                         onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
+                        //  onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
                          />
                         })
                     }
@@ -203,7 +221,7 @@ return (
                 // YellowPathDiv.map((index)=>{
                     //     if(location.includes(index)){
                     //         return (<div key = {index} className={`ludobox ${yellowColorPath.includes(index) ? "yellowLudoBox" : ""} ${index === 'g9' ? 'special' : ''}`} id = {index}>
-                    //     <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+                    //     <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
                     //     className = {`fa-location-pin piece
                     //      ${piecesVal[location.indexOf(index)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? `${piecesVal[location.indexOf(index)].team}-active` : ""}`}
                     //      onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? PieceClicked :()=>{}}
@@ -225,7 +243,7 @@ return (
                             // console.log(indexVal + "hi");
                         return <span key= {indexVal} id = {indexVal} >
                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-                         icon={faLocationPin} className = {`fa-location-pin piece 
+                         icon={faCircle} className = {`fa-location-pin piece 
                          ${piecesVal[location.indexOf(indexVal)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? `${piecesVal[location.indexOf(indexVal)].team}-active` : ""}`} 
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? PieceClicked :()=>{}}
                          />
@@ -245,7 +263,7 @@ return (
                     BluePathDiv.map((index)=>{
                         if(location.includes(index)){
                         return (<div key = {index}  className={`ludobox ${blueColorPath.includes(index) ? "blueLudoBox" : ""} ${index === 'y9' ? 'special' : ''}` } id = {index}>
-                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+                        <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piecesVal[location.indexOf(index)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? `${piecesVal[location.indexOf(index)].team}-active` : ""}`} 
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(index)].id}`)? PieceClicked :()=>{}}
@@ -261,16 +279,19 @@ return (
                  {BluePathDiv.map((index)=>{
 
                     let piecesInThis =  location.map((loc,i)=>({loc,piece : piecesVal[i]})).filter(({loc})=>(loc ===index));
-
-                    return <div key = {index}  className={`ludobox ${blueColorPath.includes(index) ? "blueLudoBox" : ""} ${index === 'y9' ? 'special' : ''}` } id = {index}>
+                    let activePieces = piecesInThis.filter(({loc,piece})=>(ActiveLocations.includes(piece.id))).map(({loc,piece})=>(piece.id));
+                    // console.log("ActivePieces = ",activePieces);
+                    return <div key = {index}  className={`ludobox ${blueColorPath.includes(index) ? "blueLudoBox" : ""} ${index === 'y9' ? 'special' : ''}` } id = {index}
+                    onClick={(activePieces.length>0 ? ()=>{PiecePathClicked(activePieces[0])}: ()=>{})}
+                    >
                     <div className="piece-container">
 
                     {
                         piecesInThis.map(({piece},i)=>{
-                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faLocationPin} 
+                        return <FontAwesomeIcon key =  {`${piece.id}`} id = {`${piece.id}`}  icon={faCircle} 
                         className = {`fa-location-pin piece
                          ${piece.team}-piece ${ActiveLocations.includes(`${piece.id}`)? `${piece.team}-active` : ""}`} 
-                         onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
+                        //  onClick={ActiveLocations.includes(`${piece.id}`)? PieceClicked :()=>{}}
                          />
                         })
                     }
@@ -287,7 +308,7 @@ return (
                         if(location.includes(indexVal)){
                         return <span key = {indexVal} id = {indexVal}>
                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-                         icon={faLocationPin} className = {`piece 
+                         icon={faCircle} className = {`piece 
                          ${piecesVal[location.indexOf(indexVal)].team}-piece ${ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? `${piecesVal[location.indexOf(indexVal)].team}-active` : ""}`}
                          onClick={ActiveLocations.includes(`${piecesVal[location.indexOf(indexVal)].id}`)? PieceClicked :()=>{}}
                          />
@@ -329,7 +350,7 @@ export default Board
 // import React from 'react'
 // import Piece from '../Components/Piece.jsx'
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faLocationPin } from "@fortawesome/free-solid-svg-icons";
+// import { faCircle } from "@fortawesome/free-solid-svg-icons";
 // import './Board.css'
 // const Board = ({pieces}) => {
 // const location = [];
@@ -369,7 +390,7 @@ export default Board
 //                         if(location.includes(indexVal)){
 //                         return <span id = {indexVal}>
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf(indexVal)].team}-piece`} />
 //                         </span>
 //                         }
@@ -382,7 +403,7 @@ export default Board
 //                   }  
 //                 {/* { location.includes("red-home-1")  ? 
 //                 <span id = "red-home-1">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-1")].id}`}  icon={faLocationPin} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-1")].team}-piece`} />
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-1")].id}`}  icon={faCircle} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-1")].team}-piece`} />
 //                     </span> :
 //                   <span id = "red-home-1">
 //                     </span> 
@@ -390,21 +411,21 @@ export default Board
 
 //                  { location.includes("red-home-2")  ? 
 //                 <span id = "red-home-2">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-2")].id}`}  icon={faLocationPin} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-2")].team}-piece`} />
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-2")].id}`}  icon={faCircle} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-2")].team}-piece`} />
 //                     </span> :
 //                   <span id = "red-home-2">
 //                     </span> 
 //                 }
 //                  { location.includes("red-home-3")  ? 
 //                 <span id = "red-home-3">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-3")].id}`}  icon={faLocationPin} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-3")].team}-piece`} />
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-3")].id}`}  icon={faCircle} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-3")].team}-piece`} />
 //                     </span> :
 //                   <span id = "red-home-3">
 //                     </span> 
 //                 }
 //                  { location.includes("red-home-4")  ? 
 //                 <span id = "red-home-4">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-4")].id}`}  icon={faLocationPin} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-4")].team}-piece`} />
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("red-home-4")].id}`}  icon={faCircle} className = {`fa-location-pin piece ${piecesVal[location.indexOf("red-home-4")].team}-piece`} />
 //                     </span> :
 //                   <span id = "red-home-4">
 //                     </span> 
@@ -424,7 +445,7 @@ export default Board
 //                     GreenPathDiv.map((index)=>{
 //                         if(location.includes(index)){
 //                             return (<div className={`ludobox ${greenColorPath.includes(index) ? "greenLudoBox" : ""}`} id = {index}>
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf(index)].team}-piece`} />
 //                     </div>)
@@ -461,7 +482,7 @@ export default Board
 //                         if(location.includes(indexVal)){
 //                         return <span id = {indexVal}>
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf(indexVal)].team}-piece`} />
 //                         </span>
 //                         }
@@ -475,7 +496,7 @@ export default Board
 
 //                   {/* { location.includes("green-home-1")  ? 
 //                 <span id = "green-home-1">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("green-home-1")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("green-home-1")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("green-home-1")].team}-piece`} />
 //                     </span> :
@@ -486,7 +507,7 @@ export default Board
 //                  { location.includes("green-home-2")  ? 
 //                 <span id = "green-home-2">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("green-home-2")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("green-home-2")].team}-piece`} />
 //                     </span> :
 //                   <span id = "green-home-2">
@@ -495,7 +516,7 @@ export default Board
 //                  { location.includes("green-home-3")  ? 
 //                 <span id = "green-home-3">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("green-home-3")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("green-home-3")].team}-piece`} />
 //                     </span> :
 //                   <span id = "green-home-3">
@@ -504,7 +525,7 @@ export default Board
 //                  { location.includes("green-home-4")  ? 
 //                 <span id = "green-home-4">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("green-home-4")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("green-home-4")].team}-piece`} />
 //                     </span> :
 //                   <span id = "green-home-4">
@@ -518,7 +539,7 @@ export default Board
 //                     RedPathDiv.map((index)=>{
 //                         if(location.includes(index)){
 //                             return (<div className={`ludobox ${redColorPath.includes(index) ? "redLudoBox" : ""}`} id = {index}>
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf(index)].team}-piece`} />
 //                     </div>)
@@ -554,7 +575,7 @@ export default Board
 //                     YellowPathDiv.map((index)=>{
 //                         if(location.includes(index)){
 //                             return (<div className={`ludobox ${yellowColorPath.includes(index) ? "yellowLudoBox" : ""}`} id = {index}>
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf(index)].team}-piece`} />
 //                     </div>)
@@ -592,7 +613,7 @@ export default Board
 //                         if(location.includes(indexVal)){
 //                         return <span id = {indexVal}>
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf(indexVal)].team}-piece`} />
 //                         </span>
 //                         }
@@ -606,7 +627,7 @@ export default Board
 
 //                        {/* { location.includes("blue-home-1")  ? 
 //                 <span id = "blue-home-1">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("blue-home-1")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("blue-home-1")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("blue-home-1")].team}-piece`} />
 //                     </span> :
@@ -617,7 +638,7 @@ export default Board
 //                  { location.includes("blue-home-2")  ? 
 //                 <span id = "blue-home-2">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("blue-home-2")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("blue-home-2")].team}-piece`} />
 //                     </span> :
 //                   <span id = "blue-home-2">
@@ -626,7 +647,7 @@ export default Board
 //                  { location.includes("blue-home-3")  ? 
 //                 <span id = "blue-home-3">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("blue-home-3")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("blue-home-3")].team}-piece`} />
 //                     </span> :
 //                   <span id = "blue-home-3">
@@ -635,7 +656,7 @@ export default Board
 //                  { location.includes("blue-home-4")  ? 
 //                 <span id = "blue-home-4">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("blue-home-4")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("blue-home-4")].team}-piece`} />
 //                     </span> :
 //                   <span id = "blue-home-4">
@@ -649,7 +670,7 @@ export default Board
 //                     BluePathDiv.map((index)=>{
 //                         if(location.includes(index)){
 //                             return (<div className={`ludobox ${blueColorPath.includes(index) ? "blueLudoBox" : ""}`} id = {index}>
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(index)].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf(index)].team}-piece`} />
 //                     </div>)
@@ -662,7 +683,7 @@ export default Board
 
 //                  {/* { location.includes("b5")  ? 
 //                <div className="ludobox" id = "b5">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("b5")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("b5")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("b5")].team}-piece`} />
 //                     </div> :
@@ -672,7 +693,7 @@ export default Board
 //                 {/* <div className="ludobox" id = "b5"></div> }
 //                      { location.includes("bh5")  ? 
 //                <div className="ludobox" id = "bh5">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("bh5")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("bh5")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("bh5")].team}-piece`} />
 //                     </div> :
@@ -682,7 +703,7 @@ export default Board
 //                 {/* <div className="ludobox blueLudoBox" id = "bh5"></div> }
 //                 { location.includes("y6")  ? 
 //                <div className="ludobox" id = "y6">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("y6")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("y6")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("y6")].team}-piece`} />
 //                     </div> :
@@ -714,7 +735,7 @@ export default Board
 //                         if(location.includes(indexVal)){
 //                         return <span id = {indexVal}>
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf(indexVal)].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf(indexVal)].team}-piece`} />
 //                         </span>
 //                         }
@@ -727,7 +748,7 @@ export default Board
 //                   }  
 //                     { { location.includes("yellow-home-1")  ? 
 //                 <span id = "yellow-home-1">
-//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("yellow-home-1")].id}`}  icon={faLocationPin} 
+//                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("yellow-home-1")].id}`}  icon={faCircle} 
 //                         className = {`fa-location-pin piece
 //                          ${piecesVal[location.indexOf("yellow-home-1")].team}-piece`} />
 //                     </span> :
@@ -738,7 +759,7 @@ export default Board
 //                  { location.includes("yellow-home-2")  ? 
 //                 <span id = "yellow-home-2">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("yellow-home-2")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("yellow-home-2")].team}-piece`} />
 //                     </span> :
 //                   <span id = "yellow-home-2">
@@ -747,7 +768,7 @@ export default Board
 //                  { location.includes("yellow-home-3")  ? 
 //                 <span id = "yellow-home-3">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("yellow-home-3")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("yellow-home-3")].team}-piece`} />
 //                     </span> :
 //                   <span id = "yellow-home-3">
@@ -756,7 +777,7 @@ export default Board
 //                  { location.includes("yellow-home-4")  ? 
 //                 <span id = "yellow-home-4">
 //                         <FontAwesomeIcon id = {`${piecesVal[location.indexOf("yellow-home-4")].id}`} 
-//                          icon={faLocationPin} className = {`fa-location-pin piece 
+//                          icon={faCircle} className = {`fa-location-pin piece 
 //                          ${piecesVal[location.indexOf("yellow-home-4")].team}-piece`} />
 //                     </span> :
 //                   <span id = "yellow-home-4">
